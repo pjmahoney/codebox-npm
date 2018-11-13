@@ -1,5 +1,7 @@
 /* eslint-disable */
 
-if (!global._babelPolyfill) {
-  require('babel-polyfill');
-}
+import "@babel/polyfill";
+
+// if (!global._babelPolyfill) {
+//   require('@babel/polyfill');
+// }

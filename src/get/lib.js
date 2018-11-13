@@ -5,7 +5,19 @@ export default async ({ pathParameters }, {
   npm,
   log,
 }, callback) => {
+  console.log(`pathParameters: ${pathParameters}`)
+
+  console.log(
+    `registry: ${registry},`
+    + `user: ${user},`
+    + `storage: ${storage},`
+    + `npm: ${npm},`
+    + `log: ${log},`
+  )
+
   const name = `${decodeURIComponent(pathParameters.name)}`;
+
+  console.log(`name: ${name}`)
 
   try {
     const pkgBuffer = await storage.get(`${name}/index.json`);

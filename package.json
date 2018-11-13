@@ -4,11 +4,12 @@
   "description": "Serverless private npm registry",
   "main": "index.js",
   "devDependencies": {
-    "aws-sdk": "^2.7.10",
-    "babel-loader": "^6.2.10",
-    "babel-plugin-rewire": "^1.0.0",
-    "babel-preset-env": "^1.1.8",
-    "babel-register": "^6.22.0",
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.5",
+    "@babel/preset-env": "^7.1.5",
+    "aws-sdk": "^2.354.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-rewire": "^1.2.0",
     "coveralls": "^2.11.15",
     "eslint": "^3.14.1",
     "eslint-config-airbnb-base": "^11.0.1",
@@ -17,9 +18,10 @@
     "mocha": "^3.2.0",
     "nsp": "^2.6.2",
     "nyc": "^10.1.2",
-    "serverless-webpack": "https://github.com/craftship/serverless-webpack.git",
+    "serverless-webpack": "^5.2.0",
     "sinon": "^1.17.7",
-    "webpack-node-externals": "^1.5.4"
+    "webpack": "^4.25.1",
+    "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
     "clean": "rm -rf ./lib && rm -rf ./coverage",
@@ -46,10 +48,9 @@
   },
   "homepage": "https://github.com/craftship/codebox-npm#readme",
   "dependencies": {
-    "@octokit/rest": "^15.8.1",
-    "babel-polyfill": "^6.22.0",
-    "babel-runtime": "^6.22.0",
+    "@babel/polyfill": "^7.0.0",
+    "@octokit/rest": "^15.17.0",
     "gitlab": "^4.2.1",
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^2.3.0"
   }
 }

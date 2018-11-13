@@ -1,4 +1,4 @@
-import Gitlab from 'gitlab';
+import { Users, Groups } from 'gitlab';
 
 const generatePolicy = ({
   effect,
@@ -56,13 +56,13 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
   const token = tokenParts[1];
 
-  const gitlab = new Gitlab({
+  const users = new Users({
     baseUrl: process.env.gitlabUrl,
     token: token
   });
 
   try {
-    const user = await gitlab.users.current();
+    const user = await users.current();
 
     let isAdmin = false;
     let effect = 'Allow';
@@ -71,9 +71,14 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
     if (restrictedOrgs.length) {
       try {
-        const groups = await gitlab.groups.all();
+        const groups = new Groups({
+          baseUrl: process.env.gitlabUrl,
+          token: token
+        });
 
-        const usersOrgs = groups.filter(org => restrictedOrgs.indexOf(org.full_path) > -1);
+        const userGroups = await groups.all();
+
+        const usersOrgs = userGroups.filter(org => restrictedOrgs.indexOf(org.full_path) > -1);
         effect = usersOrgs.length ? 'Allow' : 'Deny';
       } catch (error) {
         return callback(null, generatePolicy({

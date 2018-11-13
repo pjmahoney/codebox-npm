@@ -8,7 +8,7 @@ plugins:
   - codebox-tools
   - set-api-host
 
-service: codebox-npm
+service: io-sitesee-dev
 
 provider:
   name: aws
@@ -24,7 +24,7 @@ provider:
     githubSecret:  ${env:CODEBOX_GITHUB_SECRET}
     bucket: ${env:CODEBOX_BUCKET}-${self:provider.stage}
     region: ${self:provider.region}
-
+    gitlabUrl: ${env:CODEBOX_GITLAB_URL}
     clientId: ${env:CODEBOX_INSIGHTS_CLIENT_ID}
     secret: ${env:CODEBOX_INSIGHTS_SECRET}
   iamRoleStatements:
@@ -49,19 +49,19 @@ provider:
 
 functions:
   authorizerGithub:
-    handler: authorizerGithub.default
+    handler: src/authorizers/github.default
   authorizerGitlab:
-    handler: authorizerGitlab.default
+    handler: src/authorizers/gitlab.default
 
   put:
-    handler: put.default
+    handler: src/put/index.default
     events:
       - http:
           path: 'registry/{name}'
           method: put
           authorizer: authorizerGitlab
   get:
-    handler: get.default
+    handler: src/get/index.default
     events:
       - http:
           path: 'registry/{name}'
@@ -69,21 +69,21 @@ functions:
           authorizer: authorizerGitlab
 
   distTagsGet:
-    handler: distTagsGet.default
+    handler: src/dist-tags/get.default
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags'
           method: get
           authorizer: authorizerGitlab
   distTagsPut:
-    handler: distTagsPut.default
+    handler: src/dist-tags/put.default
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
           method: put
           authorizer: authorizerGitlab
   distTagsDelete:
-    handler: distTagsDelete.default
+    handler: src/dist-tags/delete.default
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
@@ -91,14 +91,14 @@ functions:
           authorizer: authorizerGitlab
 
   userPut:
-    handler: userPut.default
+    handler: src/user/put.default
     events:
       - http:
           path: 'registry/-/user/{id}'
           method: put
 
   userDelete:
-    handler: userDelete.default
+    handler: src/user/delete.default
     events:
       - http:
           path: 'registry/-/user/token/{token}'
@@ -106,7 +106,7 @@ functions:
           authorizer: authorizerGitlab
 
   whoamiGet:
-    handler: whoamiGet.default
+    handler: src/whoami/get.default
     events:
       - http:
           path: 'registry/-/whoami'
@@ -114,11 +114,11 @@ functions:
           authorizer: authorizerGitlab
 
   tarGet:
-    handler: tarGet.default
+    handler: src/tar/get.default
     events:
       - http:
           integration: lambda
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
           path: 'registry/{name}/-/{tar}'
           method: get
           contentHandling: CONVERT_TO_BINARY
@@ -163,4 +163,7 @@ resources:
                  "s3:x-amz-server-side-encryption": true
 
 custom:
-  webpackIncludeModules: true
+  webpack:
+    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
+    includeModules: true   # Node modules configuration for packaging
+    packager: 'yarn'   # Packager that will be used to package your external modules

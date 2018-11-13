@@ -2,7 +2,7 @@ import url from 'url';
 import GitHub from '@octokit/rest';
 import { Users } from 'gitlab';
 
-function putGithubUser(body, context, callback) {
+async function putGithubUser(body, context, callback) {
   const {
     name,
     password,
@@ -81,7 +81,7 @@ function putGithubUser(body, context, callback) {
   }
 }
 
-function putGitlabUser(body, context, callback) {
+async function putGitlabUser(body, context, callback) {
   const {
     name,
     password,
@@ -117,4 +117,4 @@ function putGitlabUser(body, context, callback) {
   }
 }
 
-export default async ({ body }, context, callback) => putGithubUser(body, context, callback);
+export default async ({ body }, context, callback) => putGitlabUser(body, context, callback);

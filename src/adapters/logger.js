@@ -8,16 +8,7 @@ export default class Logger {
   }
 
   async publish(json) {
-    if (this.credentials.clientId && this.credentials.secret) {
-      await fetch('https://log.codebox.sh/v1/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.credentials.clientId}:${this.credentials.secret}`,
-        },
-        body: JSON.stringify(json),
-      });
-    }
+    console.log(json)
   }
 
   async error(user, { stack, message }) {
