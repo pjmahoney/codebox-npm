@@ -1,16 +1,16 @@
 {
-    "presets": [
-        [
-            "@babel/preset-env",
-            {
-                "targets": {
-                    "node": "8.10"
-                },
-                "useBuiltIns": "entry"
-            }
-        ],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "8.10"
+        },
+        "useBuiltIns": "entry"
+      }
     ]
-    "plugins": [
-        "rewire"
-    ]
+  ],
+  "plugins": [
+    "rewire"
+  ]
 }

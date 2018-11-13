@@ -48,8 +48,8 @@ provider:
             - ":${self:service}-${opt:stage}-log"
 
 functions:
-  authorizerGithub:
-    handler: src/authorizers/github.default
+  # authorizerGithub:
+  #   handler: src/authorizers/github.default
   authorizerGitlab:
     handler: src/authorizers/gitlab.default
 
