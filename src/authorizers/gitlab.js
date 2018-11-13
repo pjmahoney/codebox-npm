@@ -1,4 +1,4 @@
-import GitHub from '@octokit/rest';
+import Gitlab from 'gitlab';
 
 const generatePolicy = ({
   effect,
@@ -56,48 +56,26 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
   const token = tokenParts[1];
 
-  const github = new GitHub({
-    baseUrl: process.env.githubUrl,
-  });
-
-  github.authenticate({
-    type: 'basic',
-    username: process.env.githubClientId,
-    password: process.env.githubSecret,
+  const gitlab = new Gitlab({
+    baseUrl: process.env.gitlabUrl,
+    token: token
   });
 
   try {
-    const {
-      user,
-      updated_at,
-      created_at,
-    } = await github.authorization.check({
-      client_id: process.env.githubClientId,
-      access_token: token,
-    });
+    const user = await gitlab.users.current();
 
     let isAdmin = false;
     let effect = 'Allow';
-    let restrictedOrgs = [];
-
-    if (process.env.restrictedOrgs) {
-      restrictedOrgs = process.env.restrictedOrgs.split(',');
-    }
+    let restrictedOrgs = process.env.restrictedOrgs 
+      ? process.env.restrictedOrgs.split(',') : [];
 
     if (restrictedOrgs.length) {
       try {
-        github.authenticate({
-          type: 'token',
-          token,
-        });
+        const groups = await gitlab.groups.all();
 
-        const orgs = await github.users.getOrgMemberships({
-          state: 'active',
-        });
-
-        const usersOrgs = orgs.filter(org => restrictedOrgs.indexOf(org.organization.login) > -1);
+        const usersOrgs = groups.filter(org => restrictedOrgs.indexOf(org.full_path) > -1);
         effect = usersOrgs.length ? 'Allow' : 'Deny';
-      } catch (githubError) {
+      } catch (error) {
         return callback(null, generatePolicy({
           token: tokenParts[1],
           effect: 'Deny',
@@ -108,7 +86,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
     }
 
     if (process.env.admins) {
-      isAdmin = process.env.admins.split(',').indexOf(user.login) > -1;
+      isAdmin = process.env.admins.split(',').indexOf(user.username) > -1;
     }
 
     const policy = generatePolicy({
@@ -119,10 +97,8 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
     });
 
     policy.context = {
-      username: user.login,
+      username: user.username,
       avatar: user.avatar_url,
-      updatedAt: updated_at,
-      createdAt: created_at,
     };
 
     return callback(null, policy);

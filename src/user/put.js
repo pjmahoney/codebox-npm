@@ -1,7 +1,8 @@
 import url from 'url';
 import GitHub from '@octokit/rest';
+import { Users } from 'gitlab';
 
-export default async ({ body }, context, callback) => {
+function putGithubUser(body, context, callback) {
   const {
     name,
     password,
@@ -17,11 +18,8 @@ export default async ({ body }, context, callback) => {
   const username = nameParts[0];
   const otp = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
-  const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    host: parsedUrl.host,
-    protocol: 'https',
-    pathPrefix: parsedUrl.path,
+    baseUrl: process.env.githubUrl,
   });
 
   github.authenticate({
@@ -41,6 +39,10 @@ export default async ({ body }, context, callback) => {
         'X-GitHub-OTP': otp,
       },
     });
+
+    if (auth.data !== undefined) {
+      auth = auth.data
+    }
 
     if (!auth.token.length) {
       await github.authorization.delete({
@@ -77,4 +79,42 @@ export default async ({ body }, context, callback) => {
       }),
     });
   }
-};
+}
+
+function putGitlabUser(body, context, callback) {
+  const {
+    name,
+    password,
+  } = JSON.parse(body);
+
+  const users = new Users({
+    url:   process.env.gitlabUrl,
+    token: password
+  });
+
+  try {
+    const user = await users.current();
+
+    if (user.username !== name) {
+      throw "Unauthorized";
+    }
+
+    return callback(null, {
+      statusCode: 201,
+      body: JSON.stringify({
+        ok: true,
+        token: password,
+      }),
+    });
+  } catch (error) {
+    return callback(null, {
+      statusCode: 403,
+      body: JSON.stringify({
+        ok: false,
+        error: error.message,
+      }),
+    });
+  }
+}
+
+export default async ({ body }, context, callback) => putGithubUser(body, context, callback);

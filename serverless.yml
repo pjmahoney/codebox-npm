@@ -12,7 +12,7 @@ service: codebox-npm
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
   stage: ${opt:stage}
   region: ${env:CODEBOX_REGION}
   environment:
@@ -50,6 +50,8 @@ provider:
 functions:
   authorizerGithub:
     handler: authorizerGithub.default
+  authorizerGitlab:
+    handler: authorizerGitlab.default
 
   put:
     handler: put.default
@@ -57,14 +59,14 @@ functions:
       - http:
           path: 'registry/{name}'
           method: put
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
   get:
     handler: get.default
     events:
       - http:
           path: 'registry/{name}'
           method: get
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
 
   distTagsGet:
     handler: distTagsGet.default
@@ -72,21 +74,21 @@ functions:
       - http:
           path: 'registry/-/package/{name}/dist-tags'
           method: get
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
   distTagsPut:
     handler: distTagsPut.default
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
           method: put
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
   distTagsDelete:
     handler: distTagsDelete.default
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
           method: delete
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
 
   userPut:
     handler: userPut.default
@@ -101,7 +103,7 @@ functions:
       - http:
           path: 'registry/-/user/token/{token}'
           method: delete
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
 
   whoamiGet:
     handler: whoamiGet.default
@@ -109,7 +111,7 @@ functions:
       - http:
           path: 'registry/-/whoami'
           method: get
-          authorizer: authorizerGithub
+          authorizer: authorizerGitlab
 
   tarGet:
     handler: tarGet.default
